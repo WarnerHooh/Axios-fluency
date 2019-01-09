@@ -1,0 +1,49 @@
+- request:
+    url: ^/users$
+    method: GET
+  response:
+  - status: 200
+    headers:
+      content-type: application/json
+      server: stubbedServer/4.2
+    file: users.json
+
+- request:
+    url: ^/user/(\d+)$
+    method: GET
+  response:
+  - status: 404
+    headers:
+      content-type: application/json
+      server: stubbedServer/4.2
+    body: '{"error": "Not found"}'
+
+- request:
+    url: ^/user/(\d+)$
+    method: DELETE
+  response:
+  - status: 401
+    headers:
+      content-type: application/json
+      server: stubbedServer/4.2
+    body: '{"error": "Permission denied"}'
+
+- request:
+    url: ^/user$
+    method: POST
+  response:
+  - status: 400
+    headers:
+      content-type: application/json
+      server: stubbedServer/4.2
+    body: '{"error": "Bad request"}'
+
+- request:
+    url: ^/user$
+    method: PUT
+  response:
+  - status: 500
+    headers:
+      content-type: application/json
+      server: stubbedServer/4.2
+    body: '{"error": "Internal error"}'
