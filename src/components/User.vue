@@ -1,36 +1,35 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
-    <h1>{{ foo }}</h1>
+    {{msg}}
+    <div v-for="user of users" :key="user.id">
+      {{user.name}} - {{user.gender}}
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
-import User from '../services/User';
-import {convoy} from '../utils/axios';
-
+import {Component, Prop, Vue} from "vue-property-decorator";
+import User from "../services/User";
+import {Convoy} from "../utils/axios";
 
 @Component
 export default class HelloWorld extends Vue {
   @Prop() private msg!: string;
 
-  public data() {
-      return {
-          foo: 'foo',
-      };
-  }
+  public users = [];
 
   public created() {
+    console.log(this);
     this.fetch();
   }
 
-  @convoy
+  @Convoy
   public fetch() {
     const user = new User();
-
     return user.fetchUser()
-        .then((data) => console.log(data));
+      .then((resp) => {
+        this.users = resp.data;
+      });
 
   }
 }
@@ -41,14 +40,17 @@ export default class HelloWorld extends Vue {
 h3 {
   margin: 40px 0 0;
 }
+
 ul {
   list-style-type: none;
   padding: 0;
 }
+
 li {
   display: inline-block;
   margin: 0 10px;
 }
+
 a {
   color: #42b983;
 }
