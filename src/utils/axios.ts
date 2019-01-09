@@ -27,9 +27,9 @@ export default axios;
 export function Convoy(target: VueClass<any>, name: string, descr: PropertyDescriptor) {
   const fn = descr.value;
 
-  descr.value = function () {
+  descr.value = function (...args: any) {
     // Call with `this` instead of `target` since VUE proxy
-    fn.call(this)
+    fn.call(this, ...args)
       .catch((error: AxiosError) => {
         const {status = HttpStatus.OK} = error.response || {};
         if (status >= HttpStatus.SERVER_ERROR) {
