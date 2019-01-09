@@ -9,7 +9,7 @@
 
 <script>
 import {Component, Prop, Vue} from 'vue-property-decorator';
-import User from '../services/User';
+import UserService from '../services/UserService';
 import {Convoy} from '../utils/axios';
 
 export default {
@@ -29,8 +29,8 @@ export default {
   methods: {
     @Convoy
     fetch() {
-      const user = new User();
-      return user.fetchUser()
+      const userService = new UserService();
+      return userService.fetchUsers()
         .then((resp) => {
           console.log(this)
           this.users = resp.data;

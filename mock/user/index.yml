@@ -23,6 +23,7 @@
     method: DELETE
   response:
   - status: 401
+    latency: 2000
     headers:
       content-type: application/json
       server: stubbedServer/4.2
