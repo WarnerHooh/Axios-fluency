@@ -2,27 +2,26 @@ import axios, {AxiosError} from 'axios';
 import {VueClass} from 'vue-class-component/lib/declarations';
 import {HttpStatus} from '@/model/HttpStatus';
 
-function get(url: string) {
-    return new Promise(function(resolve, reject) {
-        axios.get(url)
-            .then(function(response) {
-                console.log(response);
-                resolve(response);
-            })
-            .catch(function(error) {
-                console.log(error.response.status);
-                if (error.response.status === 401) {
-                    console.error('401 Unauthorized');
-                    return;
-                }
-                reject(error);
-            });
-    });
-}
+// Request interceptor
+axios.interceptors.request.use(function (config) {
+    return config;
+}, function (error) {
+    return Promise.reject(error);
+});
 
-export default {
-    get,
-};
+
+// Response interceptor
+axios.interceptors.response.use(function (response) {
+    return response;
+}, function (error) {
+    if (error.response.status === HttpStatus.UNAUTHORIZED) {
+        console.error('401 Unauthorized');
+        return new Promise(() => {});
+    }
+    return Promise.reject(error);
+});
+
+export default axios;
 
 export function convoy(target: VueClass<any>, name: string, descr: PropertyDescriptor) {
     const fn = descr.value;
