@@ -1,7 +1,7 @@
 import axios from '../utils/axios';
 import loading from '../utils/loading';
 import {User} from '@/model/User';
-import {FluentHttp, GET, Path, Query} from '@/utils/FluentHttp';
+import {Body, DELETE, FluentHttp, GET, Header, Path, POST, Query} from '@/utils/FluentHttp';
 
 export default class UserService extends FluentHttp {
   public static isTestable = false;
@@ -15,18 +15,13 @@ export default class UserService extends FluentHttp {
   public fetchUsers() {
   }
 
-  @loading(false)
-  @GET('http://localhost:8882/users/:id')
-  public fetchUser(@Path('id') id: number, @Query('gender') gender: string) {
-  }
-
   @loading()
-  public deleteUser(id: number) {
-    return axios.delete(`http://localhost:8882/user/${id}`);
+  @DELETE('http://localhost:8882/user/:id')
+  public deleteUser(@Path('id') id: number) {
   }
 
   @loading(false)
-  public createUser(user: User) {
-    return axios.post(`http://localhost:8882/user?a=2&b=2`, user);
+  @POST('http://localhost:8882/user')
+  public createUser(@Body user: User) {
   }
 }
