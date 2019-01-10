@@ -1,5 +1,12 @@
 const queryString = require('query-string');
 
+export interface RequestOptions {
+  headers?: { [key: string]: string | string[] };
+  params?: { [key: string]: string | string[] };
+  responseType?: 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream';
+  withCredentials?: boolean;
+}
+
 export class FluentHttp {
   constructor(protected axios: any) {
   }
@@ -65,16 +72,33 @@ function brewByHeader(target: any, methodName: string, args: any) {
   return headers;
 }
 
+function brewByOptions(realURL: string, options: RequestOptions) {
+  const url = new URL(realURL);
+  const params = options ? options.params || {} : {};
+
+  Object.keys(params).forEach(key => {
+    url.searchParams.set(key, params[key].toString());
+  });
+  return url.href;
+}
+
 function methodBuilder(method: string) {
   return function (url: string) {
     return function (target: any, methodName: string, descriptor: any) {
       descriptor.value = function (...args: any) {
         let realURL = url;
+
+        // RequestOptions
+        const options = descriptor.requestOptions;
+
         // Path
         realURL = brewByPath(target, methodName, url, args);
 
         // Query
         realURL = brewByQuery(target, methodName, realURL, args);
+
+        // Options
+        realURL = brewByOptions(realURL, options);
 
         // Body
         const body = brewByBody(target, methodName, args);
@@ -84,9 +108,14 @@ function methodBuilder(method: string) {
 
         return this.axios.request({
           method,
-          headers,
           url: realURL,
           data: body,
+          headers: {
+            ...headers,
+            ...(options ? options.headers : {}),
+          },
+          responseType: options ? options.responseType : 'json',
+          withCredentials: options ? options.withCredentials : false,
         });
       };
 
@@ -94,7 +123,6 @@ function methodBuilder(method: string) {
     };
   };
 }
-
 
 function paramBuilder(type: string, optional = false) {
   return function (key?: string) {
@@ -113,6 +141,20 @@ function paramBuilder(type: string, optional = false) {
     };
   };
 }
+
+export function RequestOptions(options: RequestOptions) {
+  return function (target: any, propertyKey: string, descriptor: any) {
+    options.responseType = options.responseType || 'json';
+    options.withCredentials = options.withCredentials || false;
+
+    descriptor.requestOptions = options;
+    return descriptor;
+  };
+}
+
+export const Headers = function (headers: { [key: string]: any }) {
+  return RequestOptions({headers});
+};
 
 export const Path = paramBuilder('Path');
 export const Query = paramBuilder('Query');

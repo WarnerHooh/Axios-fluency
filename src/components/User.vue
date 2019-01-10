@@ -50,6 +50,10 @@ export default class HelloWorld extends Vue {
 
   public created() {
     this.fetchUsers();
+
+    setTimeout(() => {
+      this.fetchUsers();
+    }, 1000)
   }
 
   @Convoy

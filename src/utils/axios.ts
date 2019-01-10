@@ -1,24 +1,27 @@
 import axios, {AxiosError} from 'axios';
-import {Message, Loading} from 'element-ui';
+import {Message} from 'element-ui';
 import {VueClass} from 'vue-class-component/lib/declarations';
 import {HttpStatus} from '@/model/HttpStatus';
-import {appendPolling} from '@/utils/loading';
+import {loadingFlux, loadingReflux} from '@/utils/LoadingHandler';
 
 // Request interceptor
 axios.interceptors.request.use(function (config) {
-  // TODO move to loading
-  // config.url = appendPolling(config.url);
+  loadingFlux(config);
   return config;
 }, function (error) {
   return Promise.reject(error);
 });
 
-
 // Response interceptor
 axios.interceptors.response.use(function (response) {
   console.log(response.request);
+  loadingReflux(response);
+
   return response;
 }, function (error) {
+  console.log(error.response);
+  loadingReflux(error.response);
+
   if (error.response.status === HttpStatus.UNAUTHORIZED) {
     console.error('401 Unauthorized');
     Message.error('Unauthorized，please login first...');
