@@ -1,6 +1,6 @@
 import axios from '../utils/axios';
 import {User} from '@/model/User';
-import {Body, DELETE, FluentHttp, GET, Header, Path, POST, Query, Headers} from '@/utils/FluentHttp';
+import {Body, DELETE, FluentHttp, GET, Header, Path, POST, Query, Headers, RequestOptions} from '@/utils/FluentHttp';
 import Loading from '@/utils/Loading';
 
 export default class UserService extends FluentHttp {
@@ -11,6 +11,9 @@ export default class UserService extends FluentHttp {
   }
 
   @Loading(false)
+  @RequestOptions({
+    responseType: 'text'
+  })
   @GET('/users')
   public fetchUsers() {
   }

@@ -111,6 +111,7 @@ function methodBuilder(method: string) {
 
         // Header
         const headers = brewByHeader(target, methodName, args);
+        console.log(options.responseType)
 
         return this.axios.request({
           method,

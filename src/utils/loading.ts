@@ -12,7 +12,7 @@ export default function (enable = true, polling = POLLING) {
   };
 };
 
-export function ignoreLoading(request: any) {
+export function ignoreLoading(url: string) {
   const regExp = new RegExp(`(\\?|&)${POLLING}=true`);
-  return regExp.test(request.responseURL);
+  return regExp.test(url);
 }
