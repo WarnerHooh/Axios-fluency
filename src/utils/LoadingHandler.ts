@@ -6,7 +6,7 @@ let loadingInstance: any = null;
 let loadingCounter: number = 0;
 
 export function loadingFlux(config: AxiosRequestConfig) {
-  if (!ignoreLoading(config.url || '')) {
+  if (!ignoreLoading(config.url)) {
     loadingInstance = Loading.service({
       text: 'Loading...',
     });
