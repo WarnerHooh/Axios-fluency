@@ -22,34 +22,35 @@ function brewByPath(target: any, methodName: string, url: string, args: any) {
 
 function brewByQuery(target: any, methodName: string, url: string, args: any) {
   const queryMetadata = target[`${methodName}_Query_parameters`] || [];
-  const api = new URL(url);
-  const urlSearchParams = api.searchParams;
-  const pathname = api.pathname;
+  const URI = queryString.parseUrl(url);
+  const urlQuery = URI.query;
 
   for (const param of queryMetadata) {
     const key = param.key;
     const value = args[param.paramIndex];
 
     if (value instanceof Date) {
-      urlSearchParams.set(key, (<Date> value).getTime().toString());
+      urlQuery[key] = (<Date> value).getTime().toString();
     } else if (Array.isArray(value)) {
-      urlSearchParams.set(key, value.map((item) => item).join(','));
+      urlQuery[key] = value.map((item) => item).join(',');
     } else if (typeof value === 'object') {
-      for (let k in value) {
+      for (const k in value) {
         if (value.hasOwnProperty(k) && value[k] !== undefined) {
-          urlSearchParams.set(k, value[k]);
+          urlQuery[k] = value[k];
         }
       }
     } else if (!!value) {
-      urlSearchParams.set(key, value.toString());
+      urlQuery[key] = value.toString();
     } else {
-      urlSearchParams.set(key, '');
+      urlQuery[key] = '';
     }
 
-    urlSearchParams.set(`${param.key}`, args[param.paramIndex]);
+    urlQuery[param.key] = args[param.paramIndex];
   }
 
-  return api.href;
+  const stringifiedQueries = queryString.stringify(urlQuery);
+
+  return stringifiedQueries ? `${URI.url}?${stringifiedQueries}` : URI.url;
 }
 
 function brewByBody(target: any, methodName: string, args: any) {
@@ -72,27 +73,32 @@ function brewByHeader(target: any, methodName: string, args: any) {
   return headers;
 }
 
-function brewByOptions(realURL: string, options: RequestOptions) {
-  const url = new URL(realURL);
+function brewByOptions(url: string, options: RequestOptions) {
+  const URI = queryString.parseUrl(url);
+  const urlQuery = URI.query;
+
   const params = options ? options.params || {} : {};
 
   Object.keys(params).forEach(key => {
-    url.searchParams.set(key, params[key].toString());
+    urlQuery[key] = params[key].toString();
   });
-  return url.href;
+
+  const stringifiedQueries = queryString.stringify(urlQuery);
+
+  return stringifiedQueries ? `${URI.url}?${stringifiedQueries}` : URI.url;
 }
 
 function methodBuilder(method: string) {
   return function (url: string) {
     return function (target: any, methodName: string, descriptor: any) {
       descriptor.value = function (...args: any) {
-        let realURL = url;
+        let realURL = `${this.axios.defaults.baseURL || ''}${url}`;
 
         // RequestOptions
         const options = descriptor.requestOptions;
 
         // Path
-        realURL = brewByPath(target, methodName, url, args);
+        realURL = brewByPath(target, methodName, realURL, args);
 
         // Query
         realURL = brewByQuery(target, methodName, realURL, args);

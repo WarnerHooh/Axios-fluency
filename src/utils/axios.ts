@@ -4,6 +4,8 @@ import {VueClass} from 'vue-class-component/lib/declarations';
 import {HttpStatus} from '@/model/HttpStatus';
 import {loadingFlux, loadingReflux} from '@/utils/LoadingHandler';
 
+axios.defaults.baseURL = 'http://localhost:8882';
+
 // Request interceptor
 axios.interceptors.request.use(function (config) {
   loadingFlux(config);

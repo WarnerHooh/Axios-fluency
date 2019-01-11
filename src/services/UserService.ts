@@ -11,15 +11,15 @@ export default class UserService extends FluentHttp {
   }
 
   @Loading(false)
-  @GET('http://localhost:8882/users')
+  @GET('/users')
   public fetchUsers() {
   }
 
-  @DELETE('http://localhost:8882/user/:id')
+  @DELETE('/user/:id')
   public deleteUser(@Path('id') id: number) {
   }
 
-  @POST('http://localhost:8882/user')
+  @POST('/user')
   public createUser(@Body user: User) {
   }
 }
