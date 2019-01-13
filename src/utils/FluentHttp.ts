@@ -111,7 +111,6 @@ function methodBuilder(method: string) {
 
         // Header
         const headers = brewByHeader(target, methodName, args);
-        console.log(options.responseType)
 
         return this.axios.request({
           method,
@@ -149,12 +148,49 @@ function paramBuilder(type: string, optional = false) {
   };
 }
 
+// function isObject(value: any) {
+//   return value && typeof value === 'object' && value.constructor === Object;
+// }
+//
+// function mergeOptions(...options: any) {
+//   return options.reduce(function(accu: any, next: any) {
+//     const merged =  Object.keys(next).reduce((prev: any, key: string) => {
+//       const value = next[key]
+//       if (isObject(value)) {
+//         return {
+//           ...prev,
+//           [key]: {
+//             ...(accu[key] || {}),
+//             ...value
+//           }
+//         }
+//       }
+//       return {
+//         ...prev,
+//         [key]: value
+//       }
+//     }, {});
+//
+//     return {
+//       ...accu,
+//       ...merged,
+//     };
+//   }, {});
+// }
+
 export function RequestOptions(options: RequestOptions) {
   return function (target: any, propertyKey: string, descriptor: any) {
-    options.responseType = options.responseType || 'json';
-    options.withCredentials = options.withCredentials || false;
+    const defaultOptions = {
+      responseType: 'json',
+      withCredentials: false
+    };
 
-    descriptor.requestOptions = options;
+    descriptor.requestOptions = {
+      ...defaultOptions,
+      ...descriptor.requestOptions,
+      ...options
+    };
+
     return descriptor;
   };
 }

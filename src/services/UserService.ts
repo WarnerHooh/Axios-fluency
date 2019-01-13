@@ -10,10 +10,6 @@ export default class UserService extends FluentHttp {
     super(axios);
   }
 
-  @Loading(false)
-  @RequestOptions({
-    responseType: 'text'
-  })
   @GET('/users')
   public fetchUsers() {
   }
