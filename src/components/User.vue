@@ -71,15 +71,30 @@ export default class HelloWorld extends Vue {
       });
   }
 
+  // PROMISE CALL
   @Convoy
   public createUser() {
     return userService.createUser({
       name: this.name,
       gender: this.gender
-    })
-      .then((resp) => {
-      });
+    });
   }
+
+  // ASYNC CALL
+  // @Convoy
+  // public async createUser() {
+  //   try {
+  //     const data = await userService.createUser({
+  //       name: this.name,
+  //       gender: this.gender
+  //     });
+  //     console.log(data)
+  //   } catch (e) {
+  //     console.log('error occured: ');
+  //     console.error(e);
+  //     throw e;
+  //   }
+  // }
 }
 </script>
 
