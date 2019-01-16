@@ -1,3 +1,4 @@
+import {Gender} from "../model/User";
 <template>
   <div class="user-container">
 
@@ -35,7 +36,7 @@
 import {Component, Prop, Vue} from "vue-property-decorator";
 import UserService from "../services/UserService";
 import {Convoy} from "../utils/axios";
-import {Gender} from '../model/User';
+import {Gender} from "../model/User";
 
 const userService = new UserService();
 
@@ -64,37 +65,43 @@ export default class HelloWorld extends Vue {
       });
   }
 
-  @Convoy
   public deleteUser(id: number) {
-    return userService.deleteUser(id)
+    return userService.deleteUser(id, Gender.MALE)
       .then((resp) => {
+        console.log(resp);
+        console.log('I want to handle the error by myself.');
       });
   }
 
   // PROMISE CALL
-  @Convoy
-  public createUser() {
-    return userService.createUser({
-      name: this.name,
-      gender: this.gender
-    });
-  }
+  // @Convoy
+  // public createUser() {
+  //   return userService.createUser({
+  //     name: this.name,
+  //     gender: this.gender
+  //   });
+  // }
 
   // ASYNC CALL
-  // @Convoy
-  // public async createUser() {
-  //   try {
-  //     const data = await userService.createUser({
-  //       name: this.name,
-  //       gender: this.gender
-  //     });
-  //     console.log(data)
-  //   } catch (e) {
-  //     console.log('error occured: ');
-  //     console.error(e);
-  //     throw e;
-  //   }
-  // }
+  @Convoy
+  public async createUser() {
+    try {
+      const data = await userService.createUser({
+        name: this.name,
+        gender: this.gender
+      });
+      console.log(data)
+    } catch (error) {
+      console.log('I just want to catch the 403 error, throw the others out!');
+
+      if (error.response && error.response.status === '403') {
+        console.error('Forbidden');
+        return;
+      }
+
+      throw error;
+    }
+  }
 }
 </script>
 

@@ -41,17 +41,23 @@ export function Convoy(target: VueClass<any>, name: string, descriptor: Property
 
   descriptor.value = function (...args: any) {
     // Call with `this` instead of `target` since VUE proxy
-    fn.call(this, ...args)
-      .catch((error: AxiosError) => {
-        const {status = HttpStatus.OK} = error.response || {};
-        if (status >= HttpStatus.SERVER_ERROR) {
-          console.error('Internal error!', error.response);
-          Message.error('Internal error, please retry later!');
-        } else if (status >= HttpStatus.CLIENT_REQUEST) {
-          console.error('Bad request!', error.response);
-          Message.error('Bad request, please check!');
-        }
-      });
+    const promise = fn.call(this, ...args);
+
+    if (promise && 'then' in promise) {
+      return promise
+        .catch((error: AxiosError) => {
+          const {status = HttpStatus.OK} = error.response || {};
+          if (status >= HttpStatus.SERVER_ERROR) {
+            console.error('Internal error!', error.response);
+            Message.error('Internal error, please retry later!');
+          } else if (status >= HttpStatus.CLIENT_ERROR) {
+            console.error('Bad request!', error.response);
+            Message.error('Bad request, please check!');
+          }
+        });
+    }
+
+    throw new Error('Unable to convoy the request! Did you forget return the result(Promise) of API request?');
   };
   return descriptor;
 }
